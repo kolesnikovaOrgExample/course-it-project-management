@@ -1,0 +1,24 @@
+# .github/workflows/auto-under-review.yml
+name: Auto Status - Under Review
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  update-review-status:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract info from PR
+        id: extract
+        run: |
+          # Анализируем название PR и ветку
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          STUDENT=$(echo $PR_TITLE | grep -oE '[A-Za-z]+-[A-Za-z]+')
+          echo "student=$STUDENT" >> $GITHUB_OUTPUT
+          
+      - name: Update to "Under Review"
+        uses: actions/github-script@v6
+        with:
+          script: |
+            // Обновляем статус в Project
