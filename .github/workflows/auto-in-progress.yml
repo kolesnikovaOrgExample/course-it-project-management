@@ -1,0 +1,27 @@
+# .github/workflows/auto-in-progress.yml
+name: Auto Status - In Progress
+
+on:
+  push:
+    branches: [assignment-*]
+
+jobs:
+  update-project-status:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract student and assignment
+        id: extract
+        run: |
+          # Извлекаем фамилию и номер задания из имени ветки
+          BRANCH_NAME="${{ github.ref_name }}"
+          STUDENT=$(echo $BRANCH_NAME | cut -d'-' -f1)
+          ASSIGNMENT=$(echo $BRANCH_NAME | cut -d'-' -f3)
+          echo "student=$STUDENT" >> $GITHUB_OUTPUT
+          echo "assignment=$ASSIGNMENT" >> $GITHUB_OUTPUT
+          
+      - name: Update project status to "In Progress"
+        uses: actions/github-script@v6
+        with:
+          script: |
+            // Здесь логика обновления Project
+            // Можно использовать GitHub API для обновления полей
