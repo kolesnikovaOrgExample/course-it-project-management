@@ -1,0 +1,48 @@
+name: 🎓 Test Student Progress Tracking
+
+on:
+  push:
+    branches: [assignment-*]
+  pull_request:
+    types: [opened]
+
+jobs:
+  detect-student-work:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔍 Extract student info from branch
+        id: extract
+        run: |
+          echo "🎯 GitHub Event: ${{ github.event_name }}"
+          echo "📝 Ref: ${{ github.ref }}"
+          echo "🔖 Ref Name: ${{ github.ref_name }}"
+          echo "👤 Actor: ${{ github.actor }}"
+          
+          if [ "${{ github.event_name }}" = "push" ]; then
+            BRANCH="${{ github.ref_name }}"
+            echo "🌿 Branch: $BRANCH"
+            
+            # Пробуем извлечь студента из имени ветки
+            STUDENT=$(echo $BRANCH | cut -d'-' -f1)
+            ASSIGNMENT=$(echo $BRANCH | cut -d'-' -f3)
+            
+            echo "📊 Extracted Student: $STUDENT"
+            echo "📚 Extracted Assignment: $ASSIGNMENT"
+            
+            echo "student=$STUDENT" >> $GITHUB_OUTPUT
+            echo "assignment=$ASSIGNMENT" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 📢 Display results
+        if: steps.extract.outputs.student
+        run: |
+          echo "✅ AUTOMATION WORKING!"
+          echo "🎓 Student: ${{ steps.extract.outputs.student }}"
+          echo "📋 Assignment: ${{ steps.extract.outputs.assignment }}"
+          echo "🟡 Status: Student started working"
+          
+      - name: 📧 Simulate notification
+        if: steps.extract.outputs.student
+        run: |
+          echo "📬 Would send notification to teacher:"
+          echo "Student ${{ steps.extract.outputs.student }} started assignment ${{ steps.extract.outputs.assignment }}"
